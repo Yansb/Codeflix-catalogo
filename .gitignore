@@ -1,0 +1,6 @@
+.gradle
+.env
+sandbox/.docker
+sandbox/app/.env.local
+build
+**/build

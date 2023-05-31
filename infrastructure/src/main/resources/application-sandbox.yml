@@ -1,0 +1,10 @@
+keycloak:
+  host: ${KEYCLOAK_HOST:http://localhost:8443}
+  realm: ${KEYCLOAK_REALM:codeflix}
+
+server:
+  port: 8080
+  undertow:
+    threads:
+      worker: 64
+      io: 4
