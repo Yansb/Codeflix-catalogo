@@ -1,3 +1,6 @@
+graphql:
+  graphiql: false
+
 logging:
   level:
     ROOT: INFO
@@ -17,6 +20,9 @@ server:
     context-path: /api
 
 spring:
+  graphql:
+    graphiql:
+      enabled: ${graphql.graphiql}
   servlet:
     multipart:
       max-file-size: 10GB

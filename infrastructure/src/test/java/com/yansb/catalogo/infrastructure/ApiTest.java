@@ -1,4 +1,4 @@
-package com.yansb.catalogo;
+package com.yansb.catalogo.infrastructure;
 
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.JwtRequestPostProcessor;
