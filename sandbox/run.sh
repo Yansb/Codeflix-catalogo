@@ -1,11 +1,8 @@
 # Criar as docker networks
-docker network create adm_videos_services
+docker network create elastic
 
-# Criar as pastas com permissões
-mkdir -m 777 .docker
-mkdir -m 777 .docker/keycloak
+docker volume create es01
 
-docker compose -f app/docker-compose.yml up -d
+docker compose -f elk/docker-compose.yml up -d elasticsearch
 
 echo "Starting 🐋️ containers..."
-sleep 20

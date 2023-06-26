@@ -1,3 +1,7 @@
+elasticsearch:
+  connect-timeout: 250
+  socket-timeout: 1_000
+
 graphql:
   graphiql: false
 
@@ -23,6 +27,12 @@ spring:
   graphql:
     graphiql:
       enabled: ${graphql.graphiql}
+  elasticsearch:
+    socket-timeout: ${elasticsearch.socket-timeout}
+    connect-timeout: ${elasticsearch.connect-timeout}
+    uris: ${elasticsearch.uris}
+    username: ${elasticsearch.username}
+    password: ${elasticsearch.password}
   servlet:
     multipart:
       max-file-size: 10GB
