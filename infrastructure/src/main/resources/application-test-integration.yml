@@ -1,3 +1,8 @@
+elasticsearch:
+  uris: http://localhost:9200
+  username: elastic
+  password: elastic
+
 keycloak:
-  host: http://test:8443
   realm: test
+  host: http://test:8443

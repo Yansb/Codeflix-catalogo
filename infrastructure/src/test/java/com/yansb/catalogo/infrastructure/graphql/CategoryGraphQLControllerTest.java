@@ -9,7 +9,7 @@ import com.yansb.catalogo.domain.category.CategorySearchQuery;
 import com.yansb.catalogo.domain.pagination.Pagination;
 import com.yansb.catalogo.domain.utils.IdUtils;
 import com.yansb.catalogo.domain.utils.InstantUtils;
-import com.yansb.catalogo.infrastructure.GraphQLControllerTest;
+import com.yansb.catalogo.GraphQLControllerTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -38,11 +38,12 @@ public class CategoryGraphQLControllerTest {
 
     @Test
     public void givenDefaultArgumentsWhenCallsListCategoriesShouldReturn() {
-        //given
+        // given
         final var expectedCategories = List.of(
                 ListCategoryOutput.from(Fixture.Categories.lives()),
                 ListCategoryOutput.from(Fixture.Categories.aulas())
         );
+
         final var expectedPage = 0;
         final var expectedPerPage = 10;
         final var expectedSort = "name";
@@ -53,12 +54,13 @@ public class CategoryGraphQLControllerTest {
                 .thenReturn(new Pagination<>(expectedPage, expectedPerPage, expectedCategories.size(), expectedCategories));
 
         final var query = """
-                    {
-                        categories {
-                            id
-                            name
-                        }
-                    }
+                {
+                  categories {
+                    id
+                    name
+                    description
+                  }
+                }
                 """;
 
         // when
@@ -69,19 +71,13 @@ public class CategoryGraphQLControllerTest {
                 .get();
 
         // then
-        Assertions.assertTrue(
-                actualCategories.size() == expectedCategories.size()
-                        && actualCategories.containsAll(expectedCategories)
-        );
-
+        Assertions.assertEquals(actualCategories.size(), expectedCategories.size());
+        Assertions.assertTrue(actualCategories.containsAll(expectedCategories));
         final var capturer = ArgumentCaptor.forClass(CategorySearchQuery.class);
-        verify(this.listCategoryUseCase, times(1))
-                .execute(
-                        capturer.capture()
-                );
+
+        verify(this.listCategoryUseCase, times(1)).execute(capturer.capture());
 
         final var actualQuery = capturer.getValue();
-
         Assertions.assertEquals(expectedPage, actualQuery.page());
         Assertions.assertEquals(expectedPerPage, actualQuery.perPage());
         Assertions.assertEquals(expectedSort, actualQuery.sort());
@@ -91,26 +87,29 @@ public class CategoryGraphQLControllerTest {
 
     @Test
     public void givenCustomArgumentsWhenCallsListCategoriesShouldReturn() {
-        //given
+        // given
         final var expectedCategories = List.of(
                 ListCategoryOutput.from(Fixture.Categories.lives()),
                 ListCategoryOutput.from(Fixture.Categories.aulas())
         );
-        final var expectedPage = 0;
-        final var expectedPerPage = 10;
-        final var expectedSort = "name";
-        final var expectedDirection = "asc";
-        final var expectedSearch = "";
+
+        final var expectedPage = 2;
+        final var expectedPerPage = 15;
+        final var expectedSort = "id";
+        final var expectedDirection = "desc";
+        final var expectedSearch = "asd";
 
         when(this.listCategoryUseCase.execute(any()))
                 .thenReturn(new Pagination<>(expectedPage, expectedPerPage, expectedCategories.size(), expectedCategories));
 
         final var query = """
                 query AllCategories($search: String, $page: Int, $perPage: Int, $sort: String, $direction: String) {
-                    categories(search: $search, page: $page, perPage: $perPage, sort: $sort, direction: $direction) {
-                        id
-                        name
-                    }
+                                
+                  categories(search: $search, page: $page, perPage: $perPage, sort: $sort, direction: $direction) {
+                    id
+                    name
+                    description
+                  }
                 }
                 """;
 
@@ -134,13 +133,10 @@ public class CategoryGraphQLControllerTest {
         );
 
         final var capturer = ArgumentCaptor.forClass(CategorySearchQuery.class);
-        verify(this.listCategoryUseCase, times(1))
-                .execute(
-                        capturer.capture()
-                );
+
+        verify(this.listCategoryUseCase, times(1)).execute(capturer.capture());
 
         final var actualQuery = capturer.getValue();
-
         Assertions.assertEquals(expectedPage, actualQuery.page());
         Assertions.assertEquals(expectedPerPage, actualQuery.perPage());
         Assertions.assertEquals(expectedSort, actualQuery.sort());
@@ -155,18 +151,18 @@ public class CategoryGraphQLControllerTest {
         final var expectedName = "Aulas";
         final var expectedDescription = "A melhor categoria";
         final var expectedActive = false;
-        final var expectedCreatedAt = InstantUtils.now().toString();
-        final var expectedUpdatedAt = InstantUtils.now().toString();
-        final var expectedDeletedAt = InstantUtils.now().toString();
+        final var expectedCreatedAt = InstantUtils.now();
+        final var expectedUpdatedAt = InstantUtils.now();
+        final var expectedDeletedAt = InstantUtils.now();
 
         final var input = Map.of(
                 "id", expectedId,
                 "name", expectedName,
                 "description", expectedDescription,
                 "active", expectedActive,
-                "createdAt", expectedCreatedAt,
-                "updatedAt", expectedUpdatedAt,
-                "deletedAt", expectedDeletedAt
+                "createdAt", expectedCreatedAt.toString(),
+                "updatedAt", expectedUpdatedAt.toString(),
+                "deletedAt", expectedDeletedAt.toString()
         );
 
         final var query = """
@@ -199,8 +195,8 @@ public class CategoryGraphQLControllerTest {
         Assertions.assertEquals(expectedName, actualCategory.name());
         Assertions.assertEquals(expectedDescription, actualCategory.description());
         Assertions.assertEquals(expectedActive, actualCategory.active());
-        Assertions.assertEquals(expectedCreatedAt, actualCategory.createdAt().toString());
-        Assertions.assertEquals(expectedUpdatedAt, actualCategory.updatedAt().toString());
-        Assertions.assertEquals(expectedDeletedAt, actualCategory.deletedAt().toString());
+        Assertions.assertEquals(expectedCreatedAt, actualCategory.createdAt());
+        Assertions.assertEquals(expectedUpdatedAt, actualCategory.updatedAt());
+        Assertions.assertEquals(expectedDeletedAt, actualCategory.deletedAt());
     }
 }
