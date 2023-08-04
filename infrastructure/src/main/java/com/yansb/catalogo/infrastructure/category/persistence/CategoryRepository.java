@@ -1,4 +1,4 @@
-package com.yansb.catalogo.infrastructure.category;
+package com.yansb.catalogo.infrastructure.category.persistence;
 
 import org.springframework.data.elasticsearch.repository.ElasticsearchRepository;
 

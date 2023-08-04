@@ -57,6 +57,18 @@ public final class Fixture {
                     null
             );
         }
+
+        public static Category talks() {
+            return Category.with(
+                    UUID.randomUUID().toString().replace("-", ""),
+                    "Talks",
+                    "Conteudo ao vivo",
+                    false,
+                    InstantUtils.now(),
+                    InstantUtils.now(),
+                    InstantUtils.now()
+            );
+        }
     }
 
 }

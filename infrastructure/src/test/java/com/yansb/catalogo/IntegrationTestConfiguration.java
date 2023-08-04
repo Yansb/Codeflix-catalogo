@@ -1,13 +1,13 @@
 package com.yansb.catalogo;
 
-import com.yansb.catalogo.infrastructure.category.CategoryRepository;
+import com.yansb.catalogo.infrastructure.category.persistence.CategoryRepository;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 
 public class IntegrationTestConfiguration {
 
     @Bean
-    public CategoryRepository categoryRepository(){
+    public CategoryRepository categoryRepository() {
         return Mockito.mock(CategoryRepository.class);
     }
 }
