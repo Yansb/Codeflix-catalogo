@@ -5,6 +5,18 @@ elasticsearch:
 graphql:
   graphiql: false
 
+kafka:
+  auto-create-topics: false
+  bootstrap-servers: localhost:9092
+  pool-timeout: 1_000
+  consumers:
+    categories:
+      auto-offset-reset: earliest
+      concurrency: 3
+      id: kafka-listener-categories
+      topics: adm_videos_mysql.adm_videos.categories
+      group-id: catalogo-service
+
 logging:
   level:
     ROOT: INFO
@@ -12,6 +24,8 @@ logging:
 
 server:
   port: 8080
+  servlet:
+    context-path: /api
   compression:
     enabled: true
     mime-types: text/html,text/xml,text/plain,text/css,text/javascript,application/javascript,application/json
@@ -20,19 +34,17 @@ server:
     threads:
       worker: 64
       io: 4
-  servlet:
-    context-path: /api
 
 spring:
   graphql:
     graphiql:
       enabled: ${graphql.graphiql}
   elasticsearch:
-    socket-timeout: ${elasticsearch.socket-timeout}
-    connect-timeout: ${elasticsearch.connect-timeout}
     uris: ${elasticsearch.uris}
     username: ${elasticsearch.username}
     password: ${elasticsearch.password}
+    socket-timeout: ${elasticsearch.socket-timeout}
+    connection-timeout: ${elasticsearch.connect-timeout}
   servlet:
     multipart:
       max-file-size: 10GB
