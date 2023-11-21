@@ -1,6 +1,9 @@
 package com.yansb.catalogo;
 
 import com.yansb.catalogo.infrastructure.configuration.WebServerConfig;
+import com.yansb.catalogo.infrastructure.kafka.models.connect.Source;
+import org.apache.kafka.clients.admin.AdminClient;
+import org.apache.kafka.clients.admin.AdminClientConfig;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.junit.jupiter.api.AfterAll;
@@ -17,7 +20,9 @@ import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
 import org.springframework.test.context.ActiveProfiles;
 
-@EmbeddedKafka(partitions = 1)
+import java.util.Collections;
+
+@EmbeddedKafka(partitions = 1, brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})
 @ActiveProfiles("test-integration")
 @EnableAutoConfiguration(exclude = {
         ElasticsearchRepositoriesAutoConfiguration.class
@@ -33,8 +38,12 @@ public class AbstractEmbeddedKafka {
     protected EmbeddedKafkaBroker kafkaBroker;
     private Producer<String, String> producer;
 
+    private AdminClient admin;
+
     @BeforeAll
     void init() {
+        admin = AdminClient.create(Collections.singletonMap(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, kafkaBroker.getBrokersAsString()));
+
         producer = new DefaultKafkaProducerFactory<>(KafkaTestUtils.producerProps(kafkaBroker), new StringSerializer(), new StringSerializer())
                 .createProducer();
     }
@@ -46,5 +55,13 @@ public class AbstractEmbeddedKafka {
 
     public Producer<String, String> producer() {
         return producer;
+    }
+
+    protected AdminClient admin() {
+        return admin;
+    }
+
+    protected Source aSource() {
+        return new Source("admin", "admin-catalogo", "categories");
     }
 }

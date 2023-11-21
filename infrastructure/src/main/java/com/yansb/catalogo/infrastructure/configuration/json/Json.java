@@ -1,5 +1,6 @@
 package com.yansb.catalogo.infrastructure.configuration.json;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
@@ -15,6 +16,18 @@ import java.util.concurrent.Callable;
 public enum Json {
     INSTANCE;
 
+    private final ObjectMapper mapper = new Jackson2ObjectMapperBuilder()
+            .dateFormat(new StdDateFormat())
+            .featuresToDisable(
+                    DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
+                    DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES,
+                    DeserializationFeature.FAIL_ON_NULL_CREATOR_PROPERTIES,
+                    SerializationFeature.WRITE_DATES_AS_TIMESTAMPS
+            )
+            .modules(new JavaTimeModule(), new Jdk8Module(), afterBurnerModule())
+            .propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
+            .build();
+
     public static ObjectMapper mapper() {
         return INSTANCE.mapper.copy();
     }
@@ -27,22 +40,8 @@ public enum Json {
         return invoke(() -> INSTANCE.mapper.readValue(json, clazz));
     }
 
-    private final ObjectMapper mapper = new Jackson2ObjectMapperBuilder()
-        .dateFormat(new StdDateFormat())
-        .featuresToDisable(
-            DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,
-            DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES,
-            DeserializationFeature.FAIL_ON_NULL_CREATOR_PROPERTIES,
-            SerializationFeature.WRITE_DATES_AS_TIMESTAMPS
-        )
-        .modules(new JavaTimeModule(), new Jdk8Module(), afterBurnerModule())
-        .propertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE)
-        .build();
-
-    private AfterburnerModule afterBurnerModule() {
-        var module = new AfterburnerModule();
-        module.setUseValueClassLoader(false);
-        return module;
+    public static <T> T readValue(final String json, final TypeReference<T> clazz) {
+        return invoke(() -> INSTANCE.mapper.readValue(json, clazz));
     }
 
     private static <T> T invoke(final Callable<T> callable) {
@@ -51,5 +50,11 @@ public enum Json {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private AfterburnerModule afterBurnerModule() {
+        var module = new AfterburnerModule();
+        module.setUseValueClassLoader(false);
+        return module;
     }
 }
